@@ -4,3 +4,8 @@
 test-framework
 HELP.md
 makefile
+
+# Output files
+*.out
+*.o
+*.out.dSYM
