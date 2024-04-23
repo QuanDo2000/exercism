@@ -3,7 +3,6 @@
 .exercism
 test-framework
 HELP.md
-makefile
 
 # Output files
 *.out
