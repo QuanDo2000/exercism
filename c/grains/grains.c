@@ -1,21 +1,9 @@
 #include "grains.h"
 
 uint64_t square(uint8_t index) {
-    if (index <= 0 || index > 64) {
-        return 0;
-    }
-
-    uint64_t ans = 1;
-    for (uint8_t i = 0; i < index - 1; i++) {
-        ans *= 2;
-    }
-    return ans;
+    return (index > 0 && index < 65) ? 1ul << (index - 1) : 0;
 }
 
 uint64_t total() {
-    uint64_t ans = 0;
-    for (int i = 1; i <= 64; i++) {
-        ans += square(i);
-    }
-    return ans;
+    return ((((uint64_t)1 << 63) - 1) << 1) + 1;
 }
