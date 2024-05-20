@@ -5,7 +5,7 @@
 static void to_text(int minutes, char text[]) {
     int hour = minutes / MINUTE_IN_HOUR;
     int minute = minutes % MINUTE_IN_HOUR;
-    snprintf(text, MAX_STR_LEN, FORMAT_STRING, hour, minute);
+    sprintf(text, FORMAT_STRING, hour, minute);
 }
 
 static int to_minutes(const char* text) {
