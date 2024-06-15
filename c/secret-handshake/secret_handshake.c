@@ -4,25 +4,19 @@
 
 static char* actions[] = {"wink", "double blink", "close your eyes", "jump"};
 
-static void reverse(const char** ans, int len) {
-    for (int i = 0; i < len / 2; i++) {
-        const char* temp = ans[i];
-        ans[i] = ans[len - i - 1];
-        ans[len - i - 1] = temp;
-    }
-}
-
 const char** commands(size_t number) {
     const char** ans = calloc(MAX_ACTIONS, sizeof(char*));
-    int idx = 0, len = 0;
-    while (number > 0 && idx < MAX_ACTIONS) {
-        int include = number % 2;
-
-        if (include) ans[len++] = actions[idx];
-
-        number >>= 1;
-        idx++;
+    int idx = 0, idx_incr = 1, len = 0, end = MAX_ACTIONS;
+    if (number & (1 << MAX_ACTIONS)) {
+        idx = MAX_ACTIONS - 1;
+        idx_incr = -1;
+        end = -1;
     }
-    if (number > 0) reverse(ans, len);
+
+    for (; idx != end; idx += idx_incr) {
+        if (number & (1 << idx)) {
+            ans[len++] = actions[idx];
+        }
+    }
     return ans;
 }
