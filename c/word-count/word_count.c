@@ -1,7 +1,6 @@
 #include "word_count.h"
 
 #include <ctype.h>
-#include <stdio.h>
 #include <string.h>
 
 static int is_word(char ch) {
