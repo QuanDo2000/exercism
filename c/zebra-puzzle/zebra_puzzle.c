@@ -1,6 +1,5 @@
 #include "zebra_puzzle.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 static char* nationality[N] = {
