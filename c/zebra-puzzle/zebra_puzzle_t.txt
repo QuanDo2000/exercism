@@ -1,0 +1,198 @@
+#include <assert.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+#include "zebra_puzzle.h"
+
+static char *nationality[5] = {
+    "Englishman",
+    "Spaniard",
+    "Ukrainian",
+    "Norwegian",
+    "Japanese",
+};
+
+#define NUMBER(n) (1 << (n - 1))
+
+#define ENGLISH (1 << 5)
+#define SPANISH (1 << 6)
+#define UKRAINIAN (1 << 7)
+#define NORWEGIAN (1 << 8)
+#define JAPANESE (1 << 9)
+
+#define RED (1 << 10)
+#define GREEN (1 << 11)
+#define IVORY (1 << 12)
+#define YELLOW (1 << 13)
+#define BLUE (1 << 14)
+
+#define DOG (1 << 15)
+#define FOX (1 << 16)
+#define SNAILS (1 << 17)
+#define HORSE (1 << 18)
+#define ZEBRA (1 << 19)
+
+#define COFFEE (1 << 20)
+#define TEA (1 << 21)
+#define MILK (1 << 22)
+#define OJ (1 << 23)
+#define WATER (1 << 24)
+
+#define OLD_GOLD (1 << 25)
+#define KOOLS (1 << 26)
+#define CHESTERFIELDS (1 << 27)
+#define LUCKY_STRIKE (1 << 28)
+#define PARLIAMENTS (1 << 29)
+
+#define EVERYTHING ((1 << 30) - 1)
+
+#define NUMBER_MASK(h) ((h) & 0x1f)
+#define OWNER_MASK(h) (((h) & (0x1f << 5)) >> 5)
+
+#define HAS(house, attribute) (((house) & (attribute)) != 0)
+#define IMPLIES(p, q) (!(p) || (q))
+
+#define RIGHT_OF(h1, h2) (NUMBER_MASK(h1) == 2 * NUMBER_MASK(h2))
+#define NEXT_DOOR(h1, h2) (RIGHT_OF(h1, h2) || RIGHT_OF(h2, h1))
+
+#define MAX_HOUSES (5 * 5 * 5 * 5 * 5 * 5)
+
+typedef unsigned int house_t;
+
+struct street {
+    house_t house[5];
+};
+
+static bool house_rules(house_t h) {
+    return (HAS(h, ENGLISH) == HAS(h, RED)) &&
+           (HAS(h, SPANISH) == HAS(h, DOG)) &&
+           (HAS(h, COFFEE) == HAS(h, GREEN)) &&
+           (HAS(h, UKRAINIAN) == HAS(h, TEA)) &&
+           IMPLIES(HAS(h, GREEN), !HAS(h, NUMBER(1))) &&
+           IMPLIES(HAS(h, IVORY), !HAS(h, NUMBER(5))) &&
+           (HAS(h, OLD_GOLD) == HAS(h, SNAILS)) &&
+           (HAS(h, KOOLS) == HAS(h, YELLOW)) &&
+           (HAS(h, MILK) == HAS(h, NUMBER(3))) &&
+           (HAS(h, NORWEGIAN) == HAS(h, NUMBER(1))) &&
+           IMPLIES(HAS(h, CHESTERFIELDS), !HAS(h, FOX)) &&
+           IMPLIES(HAS(h, KOOLS), !HAS(h, HORSE)) &&
+           (HAS(h, LUCKY_STRIKE) == HAS(h, OJ)) &&
+           (HAS(h, JAPANESE) == HAS(h, PARLIAMENTS)) &&
+           (HAS(h, BLUE) == HAS(h, NUMBER(2)));
+}
+
+static size_t feasible_houses(house_t *houses) {
+    size_t n = 0;
+    for (int number = 0; number != 5; ++number) {
+        for (int owner = 5; owner != 10; ++owner) {
+            for (int color = 10; color != 15; ++color) {
+                for (int pet = 15; pet != 20; ++pet) {
+                    for (int drink = 20; drink != 25; ++drink) {
+                        for (int smokes = 25; smokes != 30; ++smokes) {
+                            house_t h = (1 << number) | (1 << owner) | (1 << color) |
+                                        (1 << pet) | (1 << drink) | (1 << smokes);
+                            if (house_rules(h)) {
+                                houses[n++] = h;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return n;
+}
+
+static bool
+two_house_rules(house_t h1, house_t h2) {
+    return IMPLIES(HAS(h1, GREEN) && RIGHT_OF(h1, h2), HAS(h2, IVORY)) &&
+           IMPLIES(HAS(h1, CHESTERFIELDS) && HAS(h2, FOX), NEXT_DOOR(h1, h2)) &&
+           IMPLIES(HAS(h1, KOOLS) && HAS(h2, HORSE), NEXT_DOOR(h1, h2));
+}
+
+static bool street_rules(struct street *s) {
+    for (size_t i = 0; i != 5; ++i) {
+        for (size_t j = 0; j != 5; ++j) {
+            if (!two_house_rules(s->house[i], s->house[j])) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+static int compare_numbers(const void *a, const void *b) {
+    house_t h1 = *(house_t *)a;
+    house_t h2 = *(house_t *)b;
+    return (int)NUMBER_MASK(h1) - (int)NUMBER_MASK(h2);
+}
+
+static bool complete(house_t h1, house_t h2, house_t h3, house_t h4, house_t h5) {
+    return (h1 | h2 | h3 | h4 | h5) == EVERYTHING;
+}
+
+static bool make_street(struct street *street, size_t nhouse, house_t *houses) {
+    qsort(houses, nhouse, sizeof(house_t), compare_numbers);
+    house_t *start[6];
+    size_t number = 0;
+    for (house_t *h = houses; h != houses + nhouse; ++h) {
+        if (NUMBER_MASK(*h) == 1u << number) {
+            start[number++] = h;
+        }
+    }
+    assert(number == 5);
+    start[5] = &houses[nhouse];
+    bool found = false;
+    for (house_t *h1 = start[0]; h1 != start[1]; ++h1) {
+        for (house_t *h2 = start[1]; h2 != start[2]; ++h2) {
+            for (house_t *h3 = start[2]; h3 != start[3]; ++h3) {
+                for (house_t *h4 = start[3]; h4 != start[4]; ++h4) {
+                    for (house_t *h5 = start[4]; h5 != start[5]; ++h5) {
+                        if (complete(*h1, *h2, *h3, *h4, *h5)) {
+                            struct street s =
+                                (struct street){{*h1, *h2, *h3, *h4, *h5}};
+                            if (street_rules(&s)) {
+                                if (found) {  // require unique solution
+                                    return false;
+                                }
+                                *street = s;
+                                found = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return found;
+}
+
+static bool solve_the_puzzle(struct street *solution) {
+    house_t houses[MAX_HOUSES];
+    size_t nhouse = feasible_houses(houses);
+    return make_street(solution, nhouse, houses);
+}
+
+static const char *find_owner(struct street *s, house_t attribute) {
+    for (house_t *h = &s->house[0]; h != &s->house[5]; ++h) {
+        if (HAS(*h, attribute)) {
+            house_t omask = OWNER_MASK(*h);
+            for (size_t i = 0; i != 5; ++i) {
+                if ((1u << i) == omask) {
+                    return nationality[i];
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
+solution_t solve_puzzle() {
+    struct street s;
+    bool success = solve_the_puzzle(&s);
+    assert(success);
+    solution_t answer;
+    answer.drinks_water = find_owner(&s, WATER);
+    answer.owns_zebra = find_owner(&s, ZEBRA);
+    return answer;
+}
