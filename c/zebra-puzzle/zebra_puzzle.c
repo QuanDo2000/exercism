@@ -139,8 +139,8 @@ static const char* get_owner(puzzle_t* p, house_t attr) {
 
 solution_t solve_puzzle(void) {
     puzzle_t p;
-    solve(&p);
-    solution_t ans;
+    solution_t ans = (solution_t){"", ""};
+    if (!solve(&p)) return ans;
     ans.drinks_water = get_owner(&p, WATER);
     ans.owns_zebra = get_owner(&p, ZEBRA);
     return ans;
