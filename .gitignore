@@ -3,6 +3,7 @@
 .exercism
 
 # Output files
+build
 *.out
 *.o
 *.out.dSYM
