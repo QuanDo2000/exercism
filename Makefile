@@ -15,4 +15,4 @@ $(SUBDIRS_CPP):
 	cmake --build $@/build
 	rm -rf $@/build
 
-.PHONY: c cpp clean_cpp $(SUBDIRS_C) $(SUBDIRS_CPP)
+.PHONY: all c cpp clean_cpp $(SUBDIRS_C) $(SUBDIRS_CPP)
