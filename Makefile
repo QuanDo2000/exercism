@@ -1,6 +1,8 @@
 SUBDIRS_C := $(wildcard c/*/.)
 SUBDIRS_CPP := $(wildcard cpp/*/.)
 
+all: c cpp
+
 c: $(SUBDIRS_C)
 $(SUBDIRS_C):
 	$(MAKE) -C $@ test
