@@ -21,7 +21,7 @@ make test && make memcheck && make clean
 ### C++
 
 ```bash
-cmake -G "Unix Makefiles" -B build . && cd build && make && cd .. && rm -rf build
+cmake -G "Unix Makefiles" -B build . && make -C build && rm -rf build
 ```
 
 ### Zig
