@@ -1,6 +1,5 @@
 #include "say.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -10,7 +9,6 @@ static char* TEENS[] = {"ten", "eleven", "twelve", "thirteen", "fourteen", "fift
 static char* THOUSANDS[] = {"thousand", "million", "billion"};
 
 static void print_tens(int tens, char* ans) {
-    printf("%d %s", tens, ans);
     if (tens > 0) {
         if (strlen(ans) > 0) strcat(ans, " ");
         strcat(ans, TENS[tens]);
@@ -22,7 +20,6 @@ static void print_ones(int ones, char* ans) {
 }
 
 static void print_chunk(int chunk, char* ans) {
-    printf("%d %s", chunk, ans);
     if (chunk >= 100) {
         int hundred = chunk / 100;
         print_ones(hundred, ans);
