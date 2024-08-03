@@ -12,7 +12,7 @@ $(SUBDIRS_C):
 cpp: $(SUBDIRS_CPP)
 $(SUBDIRS_CPP):
 	cmake -S $@ -B $@/build -G "Unix Makefiles"
-	cmake --build $@/build -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+	cmake --build $@/build
 	rm -rf $@/build
 
 .PHONY: all c cpp clean_cpp $(SUBDIRS_C) $(SUBDIRS_CPP)
