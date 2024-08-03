@@ -20,7 +20,7 @@ jobs:
           platform_version: 20.04
       - name: Configure CMake
         run: |
-            cmake . -DCMAKE_BUILD_TYPE=$BUILD_TYPE -B build\
+            cmake ./cpp/gigasecond -DCMAKE_BUILD_TYPE=$BUILD_TYPE -B build\
             -DBoost_INCLUDE_DIR=${{steps.install-boost.outputs.BOOST_ROOT}}/include\
             -DBoost_LIBRARY_DIRS=${{steps.install-boost.outputs.BOOST_ROOT}}/lib
         env:
