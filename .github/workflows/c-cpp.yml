@@ -12,5 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Instasll boost
+        uses: MarkusJx/install-boost@v2.4.5
+        id: install-boost
+        with:
+          boost_version: 1.85.0
       - name: make
         run: make
